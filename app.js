@@ -193,4 +193,72 @@
       a.addEventListener('click', function () { hud.classList.remove('open'); });
     });
   }
+
+  /* ── LIVE OFFCANVAS ── */
+  var liveToggle = document.getElementById('liveToggle');
+  var liveOffcanvas = document.getElementById('liveOffcanvas');
+  var liveClose = document.getElementById('liveClose');
+  var liveBackdrop = document.getElementById('liveBackdrop');
+  var liveFrame = document.getElementById('liveFrame');
+  var lastFocus = null;
+
+  function startLiveFrame() {
+    if (!liveFrame) return;
+    var src = liveFrame.getAttribute('data-src');
+    if (src && liveFrame.getAttribute('src') !== src) {
+      liveFrame.setAttribute('src', src);
+    }
+  }
+
+  function stopLiveFrame() {
+    if (!liveFrame) return;
+    liveFrame.removeAttribute('src');
+  }
+
+  function openLiveOffcanvas() {
+    if (!liveOffcanvas) return;
+    lastFocus = document.activeElement;
+    liveOffcanvas.classList.add('open');
+    liveOffcanvas.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('live-open');
+    if (liveToggle) liveToggle.setAttribute('aria-expanded', 'true');
+    startLiveFrame();
+    if (liveClose) liveClose.focus();
+  }
+
+  function closeLiveOffcanvas() {
+    if (!liveOffcanvas || !liveOffcanvas.classList.contains('open')) return;
+    liveOffcanvas.classList.remove('open');
+    liveOffcanvas.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('live-open');
+    if (liveToggle) liveToggle.setAttribute('aria-expanded', 'false');
+    stopLiveFrame();
+    if (lastFocus && typeof lastFocus.focus === 'function') {
+      lastFocus.focus();
+    }
+  }
+
+  if (liveToggle && liveOffcanvas) {
+    liveToggle.addEventListener('click', function () {
+      if (liveOffcanvas.classList.contains('open')) {
+        closeLiveOffcanvas();
+      } else {
+        openLiveOffcanvas();
+      }
+    });
+  }
+
+  if (liveClose) {
+    liveClose.addEventListener('click', closeLiveOffcanvas);
+  }
+
+  if (liveBackdrop) {
+    liveBackdrop.addEventListener('click', closeLiveOffcanvas);
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      closeLiveOffcanvas();
+    }
+  });
 })();
