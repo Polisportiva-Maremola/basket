@@ -39,7 +39,9 @@
       <a href="#info">Info</a>
     </nav>
     <div class="hud-clock">
-      <span class="lv"><span class="dot-live"></span>LIVE</span>
+      <button class="live-toggle" id="liveToggle" aria-label="Apri diretta live" aria-expanded="false" aria-controls="liveOffcanvas">
+        <span class="lv"><span class="dot-live"></span>LIVE</span>
+      </button>
       <span id="clock">--:--:--</span>
     </div>
     <button class="burger" id="burger" aria-label="Menu"><span></span></button>
@@ -352,6 +354,28 @@
   </div>
 </section>
 </main>
+
+<!-- ═══════════ LIVE OFFCANVAS ═══════════ -->
+<aside class="live-offcanvas" id="liveOffcanvas" role="dialog" aria-modal="true" aria-labelledby="liveTitle" aria-hidden="true">
+  <div class="live-panel" role="document">
+    <header class="live-panel-head">
+      <h2 id="liveTitle">Maremola Live</h2>
+      <button class="live-close" id="liveClose" aria-label="Chiudi diretta">
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+    <div class="live-panel-body">
+      <iframe
+        id="liveFrame"
+        data-src="https://streaming.ricordatiilatte.it/embed/video"
+        title="Owncast"
+        referrerpolicy="origin"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+  <button class="live-backdrop" id="liveBackdrop" aria-label="Chiudi diretta live"></button>
+</aside>
 
 <!-- ═══════════ FOOTER ═══════════ -->
 <footer class="foot">
