@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>NBA Style Scoreboard Overlay</title>
+    <style>
+        /* Sfondo trasparente obbligatorio per Larix */
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: transparent !important;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Posizionamento dello scorebug (Stile NBA: in basso al centro o in alto a sinistra) */
+        .nba-scorebug {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(180deg, #161616 0%, #000000 100%);
+            color: #ffffff;
+            font-weight: 900;
+            border-radius: 4px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.8);
+            border: 2px solid #282828;
+            height: 55px;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        /* Gestione blocco Squadre */
+        .team-block {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding: 0 18px;
+        }
+        
+        /* Colori e stili specifici Squadre */
+        .home { background: #1e3a8a; border-right: 4px solid #f59e0b; }
+        .away { background: #b91c1c; border-left: 4px solid #ffffff; }
+
+        .team-name {
+            font-size: 22px;
+            text-transform: uppercase;
+            color: #ffffff;
+        }
+
+        /* Pallino possesso palla stile TV */
+        .possession-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #f59e0b;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: inline-block;
+            opacity: 1;
+        }
+        .away .possession-dot { margin-right: 0; margin-left: 10px; background-color: #ffffff; opacity: 0; }
+
+        /* Cassa dei punteggi numerici */
+        .score-display {
+            font-size: 34px;
+            font-variant-numeric: tabular-nums; /* Mantiene i numeri allineati */
+            padding: 0 20px;
+            background: #000000;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 55px;
+        }
+
+        /* Etichetta del BONUS falli */
+        .bonus-badge {
+            background: #dc2626;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 2px;
+            margin: 0 8px;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+
+        /* Centro della barra: Tempo e Quarto */
+        .time-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #0a0a0a;
+            height: 100%;
+            padding: 0 20px;
+            min-width: 90px;
+            border-left: 1px solid #222;
+            border-right: 1px solid #222;
+        }
+
+        .game-time {
+            font-size: 22px;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .game-quarter {
+            font-size: 11px;
+            color: #888888;
+            text-transform: uppercase;
+            margin-top: 4px;
+            font-weight: 700;
+        }
+
+        /* Il cronometro dei 24 secondi */
+        .shot-clock {
+            background: #f59e0b;
+            color: #000000;
+            font-size: 28px;
+            font-weight: 900;
+            height: 100%;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 35px;
+        }
+        
+        /* Effetto allarme quando i 24s stanno per scadere */
+        .shot-clock.danger {
+            background: #dc2626;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nba-scorebug">
+        <!-- TEAM HOME -->
+        <div class="team-block home">
+            <span class="possession-dot" id="dot-home"></span>
+            <span class="team-name">HOM</span>
+        </div>
+        <div class="score-display" id="score-home">98</div>
+        <span class="bonus-badge" id="bonus-home">BONUS</span>
+
+        <!-- TEAM AWAY -->
+        <span class="bonus-badge" id="bonus-away" style="opacity: 0;">BONUS</span>
+        <div class="score-display" id="score-away">102</div>
+        <div class="team-block away">
+            <span class="team-name">AWY</span>
+            <span class="possession-dot" id="dot-away"></span>
+        </div>
+
+        <!-- TEMPO DI GIOCO -->
+        <div class="time-panel">
+            <span class="game-time" id="clock">4:12</span>
+            <span class="game-quarter" id="quarter">4th QTR</span>
+        </div>
+
+        <!-- LIVE SHOT CLOCK (24 SECONDI) -->
+        <div class="shot-clock" id="shot-clock">14</div>
+    </div>
+
+</body>
+</html>
