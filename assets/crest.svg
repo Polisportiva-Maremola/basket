@@ -1,0 +1,20 @@
+<svg width="120" height="132" viewBox="0 0 120 132" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Polisportiva Maremola — stemma (placeholder)">
+  
+  <defs>
+    <linearGradient id="crestShield" x1="0" y1="0" x2="0" y2="132" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1f6bff"></stop>
+      <stop offset="1" stop-color="#0b2a6b"></stop>
+    </linearGradient>
+  </defs>
+  <path d="M8 8 H112 V70 C112 100 88 118 60 128 C32 118 8 100 8 70 Z" fill="url(#crestShield)" stroke="#ffffff" stroke-width="4"></path>
+  <path d="M8 8 H112 V70 C112 100 88 118 60 128 C32 118 8 100 8 70 Z" fill="none" stroke="#7fb2ff" stroke-width="1.5" stroke-opacity="0.5" transform="translate(0,0) scale(1)"></path>
+  
+  <circle cx="60" cy="58" r="30" fill="#ffffff"></circle>
+  <circle cx="60" cy="58" r="30" fill="none" stroke="#0b2a6b" stroke-width="2.5"></circle>
+  <line x1="60" y1="28" x2="60" y2="88" stroke="#0b2a6b" stroke-width="2.5"></line>
+  <line x1="30" y1="58" x2="90" y2="58" stroke="#0b2a6b" stroke-width="2.5"></line>
+  <path d="M38 31 C50 45 50 71 38 85" fill="none" stroke="#0b2a6b" stroke-width="2.5"></path>
+  <path d="M82 31 C70 45 70 71 82 85" fill="none" stroke="#0b2a6b" stroke-width="2.5"></path>
+  
+  <text x="60" y="112" text-anchor="middle" font-family="&#39;Saira Condensed&#39;, Arial, sans-serif" font-weight="800" font-size="20" letter-spacing="2" fill="#ffffff">PM</text>
+</svg>
