@@ -8,6 +8,7 @@ File del sito:
 - `styles.css`: tutto lo stile del sito (693 righe), con i token in `:root`.
 - `app.js`: orologio, countdown, ticker, roster, count-up dei contatori (`app.js:137-152`), reveal, scroll-spy della nav (`app.js:170-185`), menu mobile, pannello della diretta.
 - `assets/crest.svg`: lo stemma, un segnaposto ("stemma (placeholder)", `crest.svg:1`).
+- `assets/favicon.svg`, `favicon.ico` (16/32/48 px), `assets/favicon-32.png`, `assets/apple-touch-icon.png` (180 px) e `assets/icon-512.png`: la favicon, ricavata dallo stemma senza la scritta «PM» (illeggibile in piccolo); le icone quadrate hanno il fondo `#070d24`. Se cambia lo stemma, vanno rigenerate.
 - `scorebug.html`: l'overlay TV per lo streaming. È una pagina a sé, con stile proprio (vedi §4.20).
 
 Per chi legge:
