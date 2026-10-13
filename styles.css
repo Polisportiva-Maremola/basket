@@ -497,7 +497,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .info-row { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line-soft); }
 .info-row:last-child { border-bottom: none; }
 .info-row .lbl { flex: none; width: 110px; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cyan); padding-top: 2px; }
-.info-row .val { color: var(--ink); font-size: 0.95rem; }
+.info-row .val { color: var(--ink); font-size: 0.95rem; min-width: 0; overflow-wrap: anywhere; }
 .info-row .val b { color: var(--white); }
 /* mappa OpenStreetMap del palazzetto (iframe, nessuna libreria esterna) */
 .mappa {

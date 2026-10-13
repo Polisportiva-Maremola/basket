@@ -653,7 +653,7 @@ Card generata da `renderRoster` (`app.js:97-125`):
 
 - `.info-row` (`styles.css`, blocco INFO / CONTATTI): `.lbl` larga 110px, mono ciano; l'ultima riga è senza bordo. I link dentro `.val` (telefono) ereditano il colore e diventano ciano all'hover.
 - `.socials a`: 42×42 con sigla di 2 lettere e `aria-label`; hover ciano.
-- `.mappa`: card con raggio 10px, fondo `--navy-900` e bordo `inset 0 0 0 1px var(--line)`. Dentro, l'iframe di OpenStreetMap (`.mappa-frame`, altezza fissa 360px, 260px sotto i 920px: la mappa nell'iframe prende la misura al caricamento) e il piede `.mappa-piede` in mono maiuscolo `--ink-soft` con il link «Apri la mappa ▸» in `--cyan`. Coordinate del palazzetto: 44.158045, 8.290820. Nessuna libreria o chiave: è l'embed ufficiale di OpenStreetMap.
+- `.mappa`: card con raggio 10px, fondo `--navy-900` e bordo `inset 0 0 0 1px var(--line)`. Dentro, l'iframe di OpenStreetMap (`.mappa-frame`, altezza fissa 360px, 260px sotto i 920px: la mappa nell'iframe prende la misura al caricamento) e il piede `.mappa-piede` in mono maiuscolo `--ink-soft` con il link «Apri la mappa ▸» in `--cyan`. Palazzetto: edificio OSM way/202329447 (palestra in Viale della Repubblica, angolo via Cesare Battisti), centro 44.154418, 8.293509. Nessuna libreria o chiave: è l'embed ufficiale di OpenStreetMap.
 
 **Fai**: ogni icona social deve avere un `aria-label` con il nome del servizio; l'iframe della mappa deve avere un `title`. **Non fare**: non sostituire l'embed con librerie di mappe (Leaflet, Google Maps) senza un motivo scritto nella issue.
 
