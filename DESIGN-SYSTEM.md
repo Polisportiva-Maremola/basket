@@ -47,7 +47,7 @@ Valori in `oklch`. La colonna "≈ hex" è una conversione approssimata (sRGB), 
 | `--navy-800` | `oklch(0.275 0.065 264)` | — | Parte alta di `.pcard` (:381), termine dei gradienti blu (:294, :451) |
 | `--navy-700` | `oklch(0.345 0.070 264)` | — | Solo lo stemma della squadra ospite (`.team.away .crest`, :295) |
 | `--line` | `oklch(0.42 0.06 264 / 0.55)` | — | Bordi, separatori, inset shadow. Token più usato (35 usi) |
-| `--line-soft` | `oklch(0.42 0.06 264 / 0.28)` | — | Separatori leggeri (righe info, footer, griglia mappa) |
+| `--line-soft` | `oklch(0.42 0.06 264 / 0.28)` | — | Separatori leggeri (righe info, footer, piede della mappa) |
 
 **Marca ed energia**
 
@@ -71,7 +71,7 @@ Valori in `oklch`. La colonna "≈ hex" è una conversione approssimata (sRGB), 
 
 | Token | Valore | ≈ hex | Uso |
 |---|---|---|---|
-| `--live` | `oklch(0.635 0.235 24)` | `#f92c3c` | Pallino live, testo "LIVE", etichetta del ticker, pin della mappa |
+| `--live` | `oklch(0.635 0.235 24)` | `#f92c3c` | Pallino live, testo "LIVE", etichetta del ticker |
 | `--live-glow` | `oklch(0.70 0.22 26 / 0.5)` | — | Alone del pallino live (keyframes `pulse`, :165-169) e del pin (:512) |
 | `--gold` | `oklch(0.83 0.145 86)` | `#f1c047` | Solo le voci "in crescita" del ticker (`.ticker-item .up`, :341) |
 
@@ -639,20 +639,22 @@ Card generata da `renderRoster` (`app.js:97-125`):
 <div class="info-grid reveal">
   <div class="info-card">
     <h3>Segreteria</h3>
-    <div class="info-row"><span class="lbl">Orari</span><span class="val">Lun–Ven 17:00–20:00<br>Sab 09:00–12:00</span></div>
+    <div class="info-row"><span class="lbl">Sede</span><span class="val"><b>A.S.D. Polisportiva Maremola</b><br>Viale della Repubblica 74, Pietra Ligure (SV)</span></div>
+    <div class="info-row"><span class="lbl">Telefono</span><span class="val"><a href="tel:+39019617539">019 617539</a></span></div>
     <div class="socials"><a href="#" aria-label="Instagram">IG</a>…</div>
   </div>
-  <div class="map-ph">
-    <div class="pin"><span class="dot"></span><span>PalaMaremola · Mappa segnaposto</span></div>
-  </div>
+  <figure class="mappa">
+    <iframe class="mappa-frame" title="Mappa: …" src="https://www.openstreetmap.org/export/embed.html?bbox=…&amp;layer=mapnik&amp;marker=LAT%2CLON" loading="lazy"></iframe>
+    <figcaption class="mappa-piede"><span>Viale della Repubblica 74 · Pietra Ligure</span><a href="https://www.openstreetmap.org/?mlat=LAT&amp;mlon=LON#map=18/LAT/LON" target="_blank" rel="noopener">Apri la mappa ▸</a></figcaption>
+  </figure>
 </div>
 ```
 
-- `.info-row` (`styles.css:497-501`): `.lbl` larga 110px, mono ciano; l'ultima riga è senza bordo.
-- `.socials a` (:514-516): 42×42 con sigla di 2 lettere e `aria-label`; hover ciano.
-- `.map-ph` (:502-513): griglia disegnata con `repeating-linear-gradient` e pin a goccia `--live`. È un segnaposto, non una mappa.
+- `.info-row` (`styles.css`, blocco INFO / CONTATTI): `.lbl` larga 110px, mono ciano; l'ultima riga è senza bordo. I link dentro `.val` (telefono) ereditano il colore e diventano ciano all'hover.
+- `.socials a`: 42×42 con sigla di 2 lettere e `aria-label`; hover ciano.
+- `.mappa`: card con raggio 10px, fondo `--navy-900` e bordo `inset 0 0 0 1px var(--line)`. Dentro, l'iframe di OpenStreetMap (`.mappa-frame`, altezza fissa 360px, 260px sotto i 920px: la mappa nell'iframe prende la misura al caricamento) e il piede `.mappa-piede` in mono maiuscolo `--ink-soft` con il link «Apri la mappa ▸» in `--cyan`. Coordinate del palazzetto: 44.158045, 8.290820. Nessuna libreria o chiave: è l'embed ufficiale di OpenStreetMap.
 
-**Fai**: ogni icona social deve avere un `aria-label` con il nome del servizio.
+**Fai**: ogni icona social deve avere un `aria-label` con il nome del servizio; l'iframe della mappa deve avere un `title`. **Non fare**: non sostituire l'embed con librerie di mappe (Leaflet, Google Maps) senza un motivo scritto nella issue.
 
 ### 4.18 Footer
 
@@ -778,7 +780,6 @@ Soglie AA: 4,5:1 testo normale; 3:1 testo grande (≥24px, o ≥18,66px in grass
 | `--gold` su ticker | `.up` | 11,81 | ok |
 | `--live` su `--navy-950` | "LIVE" | 5,15 | ok |
 | `--live` su fondo HUD (`oklch(0.16 0.05 264 / 0.82)` su `--navy-950`, :176) | testo del pulsante LIVE | 5,07 | ok |
-| `--live` su `--navy-900` | pin della mappa (`.map-ph`, :507, :512) | 4,86 | ok |
 | `--navy-950` su `--cyan` | `.captain-flag` | 12,08 | ok |
 | `--ink-dim` su `--navy-950` | footer, `.hero-meta span` | 4,63 | al limite |
 | `--ink-dim` su `.pstat` | etichette statistiche | 4,52 | al limite |
@@ -896,7 +897,7 @@ Ogni voce: dove si trova, cosa succede, proposta. Le proposte sono suggerimenti,
 
 18. **Data della partita fissa contro countdown "vivo"**: "SAB 06 GIU · 21:00" (`index.html:109`) e "J-7" (`index.html:94`) sono statici, mentre il countdown punta sempre al prossimo sabato alle 21 (`app.js:19-29`). *Proposta*: una sola fonte (data in un attributo `data-` letta da JS, che genera sia il testo sia il countdown).
 19. **Pallino live sempre acceso** su pulsante LIVE, pill, scorebug e ticker (`index.html:43, 71, 94, 125`) anche senza diretta. *Proposta*: accenderlo solo durante una diretta.
-20. **Testi rivolti al gestore visibili al pubblico**: "Schede dimostrative, statistiche di esempio." (175), "Loghi segnaposto…" (194), "Sostituisci i collegamenti con i tuoi PDF." (232), "Mappa segnaposto" (351), P.IVA `00000000000` (402), telefono `+39 019 000 000` (342), stemma "placeholder" (`crest.svg:1`). *Proposta*: sostituirli con i contenuti reali prima di considerare il sito definitivo.
+20. **Testi rivolti al gestore visibili al pubblico**: "Schede dimostrative, statistiche di esempio." (175), "Loghi segnaposto…" (194), "Sostituisci i collegamenti con i tuoi PDF." (232), P.IVA `00000000000` (402), stemma "placeholder" (`crest.svg:1`). *Proposta*: sostituirli con i contenuti reali prima di considerare il sito definitivo.
 21. **Email su un altro dominio**: `info@maremolabasket.it` (`index.html:341`) contro `basket.polmaremola.it`. *Proposta*: verificare con la società quale sia corretto.
 22. **Lingue e sigle miste**: inglese senza `lang` (`index.html:43, 125, 175, 192-213`; `app.js:52, 106, 108`); sigle italiane e inglesi insieme (PT/AS/RB/ST/PTI/RIM con 3P/BS/PG/SF/C, `app.js:72-92`); `scorebug.html` con `lang="it"` e testi in inglese ("4th QTR", "BONUS", titolo "NBA Style Scoreboard Overlay"). *Proposta*: scegliere una lingua per le sigle e marcare le parti inglesi.
 23. **Formati della stagione diversi**: "2025 / 26" (`index.html:70`) e "25/26" (`index.html:248`, `app.js:58`). *Proposta*: un solo formato.

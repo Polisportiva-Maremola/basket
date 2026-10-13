@@ -499,18 +499,24 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .info-row .lbl { flex: none; width: 110px; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cyan); padding-top: 2px; }
 .info-row .val { color: var(--ink); font-size: 0.95rem; }
 .info-row .val b { color: var(--white); }
-.map-ph {
-  border-radius: 10px; min-height: 100%; position: relative; overflow: hidden;
-  background:
-    repeating-linear-gradient(0deg, transparent 0 38px, var(--line-soft) 38px 39px),
-    repeating-linear-gradient(90deg, transparent 0 38px, var(--line-soft) 38px 39px),
-    var(--navy-900);
-  box-shadow: inset 0 0 0 1px var(--line);
-  display: grid; place-items: center;
+/* mappa OpenStreetMap del palazzetto (iframe, nessuna libreria esterna) */
+.mappa {
+  margin: 0; border-radius: 10px; overflow: hidden; min-height: 100%;
+  display: flex; flex-direction: column;
+  background: var(--navy-900); box-shadow: inset 0 0 0 1px var(--line);
 }
-.map-ph .pin { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.map-ph .pin .dot { width: 18px; height: 18px; border-radius: 50% 50% 50% 0; background: var(--live); transform: rotate(-45deg); box-shadow: 0 0 0 6px var(--live-glow); }
-.map-ph .pin span { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.12em; color: var(--ink-soft); text-transform: uppercase; }
+/* altezza fissa: la mappa dentro l'iframe prende la misura al caricamento */
+.mappa-frame { display: block; flex: none; width: 100%; height: 360px; border: 0; }
+.mappa-piede { margin-top: auto; }
+.mappa-piede {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 12px 16px; border-top: 1px solid var(--line-soft);
+  font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft);
+}
+.mappa-piede a { color: var(--cyan); }
+.mappa-piede a:hover, .mappa-piede a:focus-visible { color: var(--white); }
+.info-row .val a { color: inherit; }
+.info-row .val a:hover, .info-row .val a:focus-visible { color: var(--cyan); }
 .socials { display: flex; gap: 10px; margin-top: 18px; }
 .socials a { width: 42px; height: 42px; border-radius: 7px; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); transition: all 0.15s; font-family: var(--font-hud); font-weight: 700; font-size: 0.8rem; }
 .socials a:hover { color: var(--cyan); box-shadow: inset 0 0 0 1px var(--cyan); }
@@ -663,7 +669,7 @@ body.live-open {
   .hud.open .nav a { padding: 13px; }
   .hero-grid { grid-template-columns: 1fr; gap: 36px; }
   .info-grid { grid-template-columns: 1fr; }
-  .map-ph { min-height: 260px; }
+  .mappa-frame { height: 260px; }
 }
 @media (max-width: 560px) {
   .wrap, .hud-inner { padding-left: 18px; padding-right: 18px; }
