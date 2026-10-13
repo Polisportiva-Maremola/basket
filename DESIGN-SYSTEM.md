@@ -668,7 +668,7 @@ Card generata da `renderRoster` (`app.js:97-125`):
         <div class="foot-col"><b>Società</b><a href="#storia">Storia</a>…</div>
       </div>
     </div>
-    <div class="foot-bot"><span>© 2026 …</span><span>P.IVA … · Affiliata FIP</span></div>
+    <div class="foot-bot"><span>© 2026 …</span><span>C.F. … · Affiliata FIP</span></div>
   </div>
 </footer>
 ```
