@@ -809,7 +809,7 @@ Soglie AA: 4,5:1 testo normale; 3:1 testo grande (≥24px, o ≥18,66px in grass
 - **Tab**: mancano `role="tabpanel"`, `aria-controls`, la navigazione con le frecce; il cambio di contenuto non è annunciato.
 - **Burger**: niente `aria-expanded` né `aria-controls` (`index.html:47`, `app.js:191`); il menu non si chiude con Esc.
 - **Titoli**: la timeline passa da H2 a H4 (`index.html:146-161`); card giocatore e footer senza titoli.
-- **Link**: social, documenti e due link del footer hanno `href="#"`; il nome dei link documento è tutto il contenuto concatenato; email e telefono non sono `mailto:`/`tel:` (`index.html:341-342`).
+- **Link**: social, documenti e due link del footer hanno `href="#"`; il nome dei link documento è tutto il contenuto concatenato; email e telefono sono link `mailto:`/`tel:`.
 - **Lingua**: parti in inglese senza `lang="en"`; emoji 👟 e 🏀 usate come etichette di dati (`app.js:90-92, 104`).
 - Nessuno skip link.
 
@@ -899,7 +899,6 @@ Ogni voce: dove si trova, cosa succede, proposta. Le proposte sono suggerimenti,
 18. **Data della partita fissa contro countdown "vivo"**: "SAB 06 GIU · 21:00" (`index.html:109`) e "J-7" (`index.html:94`) sono statici, mentre il countdown punta sempre al prossimo sabato alle 21 (`app.js:19-29`). *Proposta*: una sola fonte (data in un attributo `data-` letta da JS, che genera sia il testo sia il countdown).
 19. **Pallino live sempre acceso** su pulsante LIVE, pill, scorebug e ticker (`index.html:43, 71, 94, 125`) anche senza diretta. *Proposta*: accenderlo solo durante una diretta.
 20. **Testi rivolti al gestore visibili al pubblico**: "Schede dimostrative, statistiche di esempio." (175), "Loghi segnaposto…" (194), "Sostituisci i collegamenti con i tuoi PDF." (232), P.IVA `00000000000` (402), stemma "placeholder" (`crest.svg:1`). *Proposta*: sostituirli con i contenuti reali prima di considerare il sito definitivo.
-21. **Email su un altro dominio**: `info@maremolabasket.it` (`index.html:341`) contro `basket.polmaremola.it`. *Proposta*: verificare con la società quale sia corretto.
 22. **Lingue e sigle miste**: inglese senza `lang` (`index.html:43, 125, 175, 192-213`; `app.js:52, 106, 108`); sigle italiane e inglesi insieme (PT/AS/RB/ST/PTI/RIM con 3P/BS/PG/SF/C, `app.js:72-92`); `scorebug.html` con `lang="it"` e testi in inglese ("4th QTR", "BONUS", titolo "NBA Style Scoreboard Overlay"). *Proposta*: scegliere una lingua per le sigle e marcare le parti inglesi.
 23. **Formati della stagione diversi**: "2025 / 26" (`index.html:70`) e "25/26" (`index.html:248`, `app.js:58`). *Proposta*: un solo formato.
 
