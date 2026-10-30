@@ -224,6 +224,16 @@
           <button class="cal-filter" data-filter="home">Solo Casa</button>
         </div>
         <div class="cal-actions">
+          <div class="cal-view-switch" role="group" aria-label="Modalità di visualizzazione">
+            <button class="cal-view-btn active" data-view="list" aria-pressed="true" title="Vista elenco gare">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h12v2H2z"/></svg>
+              <span>Elenco</span>
+            </button>
+            <button class="cal-view-btn" data-view="month" aria-pressed="false" title="Vista calendario mensile">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 2h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm1 3v8h8V5H4zm1 2h2v2H5V7zm3 0h2v2H8V7z"/></svg>
+              <span>Mese</span>
+            </button>
+          </div>
           <a class="btn btn-ghost cal-dl-btn" id="calDownloadBtn" href="assets/calendari/calendario-dr2-2026-2027.pdf" target="_blank" rel="noopener">
             Scarica PDF ↓
           </a>
@@ -231,7 +241,35 @@
       </div>
     </div>
 
+    <!-- Vista 1: Elenco sequenziale a griglia -->
     <div class="cal-grid reveal" id="calGrid" aria-live="polite"></div>
+
+    <!-- Vista 2: Calendario Mensile Interattivo -->
+    <div class="cal-month-wrap reveal hidden" id="calMonthWrap" aria-live="polite">
+      <div class="month-nav">
+        <div class="month-nav-ctrl">
+          <button class="month-nav-btn" id="monthPrevBtn" aria-label="Mese precedente">‹</button>
+          <h3 class="month-title" id="monthTitle">Ottobre 2026</h3>
+          <button class="month-nav-btn" id="monthNextBtn" aria-label="Mese successivo">›</button>
+        </div>
+        <div class="month-pills" id="monthPills" role="tablist" aria-label="Seleziona mese rapido"></div>
+      </div>
+
+      <div class="month-table">
+        <div class="month-weekdays">
+          <span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span>
+        </div>
+        <div class="month-days" id="monthDays"></div>
+      </div>
+
+      <div class="month-day-detail hidden" id="monthDayDetail">
+        <div class="month-detail-head">
+          <div class="month-detail-date" id="monthDetailDate">Dettaglio gare</div>
+          <div class="month-detail-count" id="monthDetailCount"></div>
+        </div>
+        <div class="month-detail-matches" id="monthDetailMatches"></div>
+      </div>
+    </div>
   </div>
 </section>
 

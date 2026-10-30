@@ -1125,8 +1125,20 @@
   /* ── CALENDARI COMPONENT ── */
   var currentCalCat = 'all';
   var currentCalFilter = 'all';
+  var currentCalView = 'list';
   var calGrid = document.getElementById('calGrid');
+  var calMonthWrap = document.getElementById('calMonthWrap');
   var calDlBtn = document.getElementById('calDownloadBtn');
+
+  var monthTitle = document.getElementById('monthTitle');
+  var monthPills = document.getElementById('monthPills');
+  var monthDays = document.getElementById('monthDays');
+  var monthPrevBtn = document.getElementById('monthPrevBtn');
+  var monthNextBtn = document.getElementById('monthNextBtn');
+  var monthDayDetail = document.getElementById('monthDayDetail');
+  var monthDetailDate = document.getElementById('monthDetailDate');
+  var monthDetailCount = document.getElementById('monthDetailCount');
+  var monthDetailMatches = document.getElementById('monthDetailMatches');
 
   var pdfMap = {
     dr2: 'assets/calendari/calendario-dr2-2026-2027.pdf',
@@ -1135,45 +1147,62 @@
     all: 'assets/calendari/calendario-dr2-2026-2027.pdf'
   };
 
-  function renderCalendar(cat, filter) {
-    if (!calGrid) return;
-    currentCalCat = cat || currentCalCat;
-    currentCalFilter = filter || currentCalFilter;
+  var SEASON_MONTHS = [
+    { key: '2026-10', year: 2026, month: 10, name: 'Ottobre 2026', short: 'Ott 26' },
+    { key: '2026-11', year: 2026, month: 11, name: 'Novembre 2026', short: 'Nov 26' },
+    { key: '2026-12', year: 2026, month: 12, name: 'Dicembre 2026', short: 'Dic 26' },
+    { key: '2027-01', year: 2027, month: 1,  name: 'Gennaio 2027',  short: 'Gen 27' },
+    { key: '2027-02', year: 2027, month: 2,  name: 'Febbraio 2027', short: 'Feb 27' },
+    { key: '2027-03', year: 2027, month: 3,  name: 'Marzo 2027',    short: 'Mar 27' }
+  ];
 
-    if (calDlBtn && pdfMap[currentCalCat]) {
-      calDlBtn.setAttribute('href', pdfMap[currentCalCat]);
+  var todayIso = new Date().toISOString().slice(0, 10);
+  var currentMonthIdx = 0;
+  if (nextMatch && nextMatch.date) {
+    var nextMonthKey = nextMatch.date.slice(0, 7);
+    for (var ni = 0; ni < SEASON_MONTHS.length; ni++) {
+      if (SEASON_MONTHS[ni].key === nextMonthKey) {
+        currentMonthIdx = ni;
+        break;
+      }
     }
+  }
 
-    var now = Date.now();
-    var list = (allMatches || []).filter(function (m) {
+  var selectedCalDate = (nextMatch && nextMatch.date) ? nextMatch.date : null;
+
+  function getFilteredMatches() {
+    return (allMatches || []).filter(function (m) {
       if (currentCalCat !== 'all' && m.category !== currentCalCat) return false;
       if (currentCalFilter === 'andata' && m.phase !== 'andata') return false;
       if (currentCalFilter === 'ritorno' && m.phase !== 'ritorno') return false;
       if (currentCalFilter === 'home' && (!m.isHome || m.bye)) return false;
       return true;
     });
+  }
 
-    if (!list.length) {
-      calGrid.innerHTML = '<div class="mcard bye"><div class="mcard-bye-title">Nessuna partita trovata</div><div class="mcard-bye-sub">Prova a selezionare un altro filtro</div></div>';
+  function renderDayDetail(dateStr, matches) {
+    if (!monthDayDetail || !monthDetailDate || !monthDetailMatches) return;
+    if (!dateStr || !matches || matches.length === 0) {
+      var dParts = dateStr ? dateStr.split('-') : [];
+      var formattedDate = dParts.length === 3 ? dParts[2] + '/' + dParts[1] + '/' + dParts[0] : '';
+      monthDetailDate.textContent = formattedDate ? 'Giorno ' + formattedDate : 'Nessuna partita';
+      if (monthDetailCount) monthDetailCount.textContent = '0 gare in programma';
+      monthDetailMatches.innerHTML = '<div class="mcard bye" style="grid-column: 1 / -1;"><div class="mcard-bye-title">Nessun match ufficiale</div><div class="mcard-bye-sub">Nessuna gara a calendario per la data o i filtri selezionati</div></div>';
+      monthDayDetail.classList.remove('hidden');
       return;
     }
 
-    calGrid.innerHTML = list.map(function (m) {
-      if (m.bye) {
-        return '<article class="mcard bye">' +
-          '<div class="mcard-meta"><span class="mcard-cat">' + m.categoryShort + '</span> <span class="mcard-phase">' + m.phaseName + ' · G' + m.round + '</span></div>' +
-          '<div class="mcard-bye-title">TURNO DI RIPOSO</div>' +
-          '<div class="mcard-bye-sub">Nessun match ufficiale in questa giornata</div>' +
-        '</article>';
-      }
+    var firstM = matches[0];
+    var dArr = dateStr.split('-');
+    var itDate = (firstM.day ? firstM.day + ' ' : '') + dArr[2] + '/' + dArr[1] + '/' + dArr[0];
+    monthDetailDate.textContent = itDate;
+    if (monthDetailCount) {
+      monthDetailCount.textContent = matches.length === 1 ? '1 partita in programma' : matches.length + ' partite in programma';
+    }
 
-      var matchTime = new Date(m.datetime).getTime();
+    monthDetailMatches.innerHTML = matches.map(function (m) {
       var isNext = nextMatch && nextMatch.id === m.id;
-      var isPast = matchTime < now - 2 * 3600 * 1000;
-      var d = m.date.split('-');
-      var dayMonth = d[2] + '/' + d[1];
-
-      return '<article class="mcard' + (isNext ? ' next' : '') + (isPast ? ' past' : '') + '">' +
+      return '<article class="mcard' + (isNext ? ' next' : '') + '">' +
         '<div class="mcard-top">' +
           '<div class="mcard-meta">' +
             '<span class="mcard-cat">' + m.categoryShort + '</span>' +
@@ -1195,18 +1224,209 @@
           '</div>' +
         '</div>' +
         '<div class="mcard-foot">' +
-          '<span class="mcard-when">' + m.day + ' ' + dayMonth + ' · ' + m.time + '</span>' +
+          '<span class="mcard-when">' + m.day + ' ' + dArr[2] + '/' + dArr[1] + ' · ' + m.time + '</span>' +
           '<span class="mcard-loc" title="' + m.location + '">' + m.location + '</span>' +
         '</div>' +
       '</article>';
     }).join('');
 
-    Array.prototype.forEach.call(calGrid.children, function (el, i) {
-      el.style.opacity = 0;
-      el.style.transform = 'translateY(14px)';
-      el.style.transition = 'opacity .35s cubic-bezier(.22,1,.36,1), transform .35s cubic-bezier(.22,1,.36,1)';
-      setTimeout(function () { el.style.opacity = 1; el.style.transform = 'none'; }, 20 + Math.min(i, 14) * 25);
+    monthDayDetail.classList.remove('hidden');
+  }
+
+  function renderMonthView() {
+    if (!calMonthWrap || !monthDays) return;
+    var monthData = SEASON_MONTHS[currentMonthIdx];
+    if (!monthData) return;
+
+    if (monthTitle) monthTitle.textContent = monthData.name;
+
+    // Month pills
+    if (monthPills) {
+      monthPills.innerHTML = SEASON_MONTHS.map(function (m, idx) {
+        return '<button class="month-pill' + (idx === currentMonthIdx ? ' active' : '') + '" data-month-idx="' + idx + '">' + m.short + '</button>';
+      }).join('');
+      monthPills.querySelectorAll('.month-pill').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          currentMonthIdx = parseInt(btn.getAttribute('data-month-idx'), 10);
+          renderMonthView();
+        });
+      });
+    }
+
+    if (monthPrevBtn) monthPrevBtn.disabled = currentMonthIdx === 0;
+    if (monthNextBtn) monthNextBtn.disabled = currentMonthIdx === SEASON_MONTHS.length - 1;
+
+    var y = monthData.year;
+    var m = monthData.month;
+    var totalDays = new Date(y, m, 0).getDate();
+    var firstDayIndex = new Date(y, m - 1, 1).getDay();
+    var startOffset = (firstDayIndex + 6) % 7;
+    var prevMonthDays = new Date(y, m - 1, 0).getDate();
+
+    var filteredList = getFilteredMatches();
+    var matchesByDate = {};
+    filteredList.forEach(function (match) {
+      if (match.date && !match.bye) {
+        if (!matchesByDate[match.date]) matchesByDate[match.date] = [];
+        matchesByDate[match.date].push(match);
+      }
     });
+
+    var html = '';
+
+    // Leading days
+    for (var p = startOffset - 1; p >= 0; p--) {
+      var pNum = prevMonthDays - p;
+      html += '<div class="month-day-cell is-other-month"><div class="day-num-wrap"><span class="day-num">' + pNum + '</span></div></div>';
+    }
+
+    // Days of month
+    var hasSelectedDateInMonth = false;
+    for (var d = 1; d <= totalDays; d++) {
+      var dStr = String(d).padStart(2, '0');
+      var mStr = String(m).padStart(2, '0');
+      var dateKey = y + '-' + mStr + '-' + dStr;
+      var isToday = dateKey === todayIso;
+      var isSelected = dateKey === selectedCalDate;
+      if (isSelected) hasSelectedDateInMonth = true;
+      var dayMatches = matchesByDate[dateKey] || [];
+      var hasM = dayMatches.length > 0;
+
+      var chipsHtml = '';
+      var dotsHtml = '';
+      if (hasM) {
+        chipsHtml = '<div class="day-match-chips">' + dayMatches.map(function (dm) {
+          var catClass = 'cat-' + dm.category;
+          var locText = dm.isHome ? 'Casa' : '@' + dm.awayCrest;
+          return '<div class="day-chip ' + catClass + '" title="' + dm.categoryName + ' vs ' + (dm.isHome ? dm.away : dm.home) + '">' +
+            '<span>' + dm.categoryShort + ' ' + dm.time + '</span>' +
+            '<span class="day-chip-loc">' + locText + '</span>' +
+          '</div>';
+        }).join('') + '</div>';
+
+        dotsHtml = '<div class="day-mobile-dots">' + dayMatches.map(function (dm) {
+          return '<span class="day-dot cat-' + dm.category + '" title="' + dm.categoryShort + '"></span>';
+        }).join('') + '</div>';
+      }
+
+      var countBadge = hasM ? '<span class="day-matches-count">' + dayMatches.length + (dayMatches.length === 1 ? ' GARA' : ' GARE') + '</span>' : '';
+
+      html += '<div class="month-day-cell' + (isToday ? ' is-today' : '') + (isSelected ? ' is-selected' : '') + (hasM ? ' has-matches' : '') + '" data-date="' + dateKey + '">' +
+        '<div class="day-num-wrap">' +
+          '<span class="day-num">' + d + '</span>' +
+          countBadge +
+        '</div>' +
+        chipsHtml +
+        dotsHtml +
+      '</div>';
+    }
+
+    // Trailing days
+    var totalCells = startOffset + totalDays;
+    var trailing = (7 - (totalCells % 7)) % 7;
+    for (var t = 1; t <= trailing; t++) {
+      html += '<div class="month-day-cell is-other-month"><div class="day-num-wrap"><span class="day-num">' + t + '</span></div></div>';
+    }
+
+    monthDays.innerHTML = html;
+
+    if (!hasSelectedDateInMonth) {
+      var firstMatchDayInMonth = null;
+      for (var f = 1; f <= totalDays; f++) {
+        var checkKey = y + '-' + String(m).padStart(2, '0') + '-' + String(f).padStart(2, '0');
+        if (matchesByDate[checkKey] && matchesByDate[checkKey].length > 0) {
+          firstMatchDayInMonth = checkKey;
+          break;
+        }
+      }
+      selectedCalDate = firstMatchDayInMonth;
+    }
+
+    monthDays.querySelectorAll('.month-day-cell:not(.is-other-month)').forEach(function (cell) {
+      cell.addEventListener('click', function () {
+        var clickedDate = cell.getAttribute('data-date');
+        selectedCalDate = clickedDate;
+        monthDays.querySelectorAll('.month-day-cell').forEach(function (c) { c.classList.remove('is-selected'); });
+        cell.classList.add('is-selected');
+        renderDayDetail(clickedDate, matchesByDate[clickedDate] || []);
+      });
+    });
+
+    if (selectedCalDate) {
+      renderDayDetail(selectedCalDate, matchesByDate[selectedCalDate] || []);
+    } else {
+      if (monthDayDetail) monthDayDetail.classList.add('hidden');
+    }
+  }
+
+  function renderCalendar(cat, filter) {
+    currentCalCat = cat || currentCalCat;
+    currentCalFilter = filter || currentCalFilter;
+
+    if (calDlBtn && pdfMap[currentCalCat]) {
+      calDlBtn.setAttribute('href', pdfMap[currentCalCat]);
+    }
+
+    var now = Date.now();
+    var list = getFilteredMatches();
+
+    if (calGrid) {
+      if (!list.length) {
+        calGrid.innerHTML = '<div class="mcard bye"><div class="mcard-bye-title">Nessuna partita trovata</div><div class="mcard-bye-sub">Prova a selezionare un altro filtro</div></div>';
+      } else {
+        calGrid.innerHTML = list.map(function (m) {
+          if (m.bye) {
+            return '<article class="mcard bye">' +
+              '<div class="mcard-meta"><span class="mcard-cat">' + m.categoryShort + '</span> <span class="mcard-phase">' + m.phaseName + ' · G' + m.round + '</span></div>' +
+              '<div class="mcard-bye-title">TURNO DI RIPOSO</div>' +
+              '<div class="mcard-bye-sub">Nessun match ufficiale in questa giornata</div>' +
+            '</article>';
+          }
+
+          var matchTime = new Date(m.datetime).getTime();
+          var isNext = nextMatch && nextMatch.id === m.id;
+          var isPast = matchTime < now - 2 * 3600 * 1000;
+          var d = m.date.split('-');
+          var dayMonth = d[2] + '/' + d[1];
+
+          return '<article class="mcard' + (isNext ? ' next' : '') + (isPast ? ' past' : '') + '">' +
+            '<div class="mcard-top">' +
+              '<div class="mcard-meta">' +
+                '<span class="mcard-cat">' + m.categoryShort + '</span>' +
+                '<span class="mcard-phase">' + (m.phase === 'andata' ? 'AND' : 'RIT') + ' · G' + m.round + '</span>' +
+              '</div>' +
+              (isNext ? '<span class="pill pill-live"><span class="dot-live"></span> PROSSIMA</span>' : '<span class="mcard-code">GARA #' + m.code + '</span>') +
+            '</div>' +
+            '<div class="mcard-teams">' +
+              '<div class="mcard-team ' + (m.isHome ? 'home-highlight' : '') + '">' +
+                '<div class="mcard-crest">' + m.homeCrest + '</div>' +
+                '<b>' + m.home + '</b>' +
+                '<span class="badge-tag ' + (m.isHome ? 'home' : 'away') + '">' + (m.isHome ? 'CASA' : 'OSP') + '</span>' +
+              '</div>' +
+              '<div class="mcard-vs">VS</div>' +
+              '<div class="mcard-team ' + (!m.isHome ? 'home-highlight' : '') + '">' +
+                '<div class="mcard-crest">' + m.awayCrest + '</div>' +
+                '<b>' + m.away + '</b>' +
+                '<span class="badge-tag ' + (!m.isHome ? 'home' : 'away') + '">' + (!m.isHome ? 'CASA' : 'TRASF') + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="mcard-foot">' +
+              '<span class="mcard-when">' + m.day + ' ' + dayMonth + ' · ' + m.time + '</span>' +
+              '<span class="mcard-loc" title="' + m.location + '">' + m.location + '</span>' +
+            '</div>' +
+          '</article>';
+        }).join('');
+
+        Array.prototype.forEach.call(calGrid.children, function (el, i) {
+          el.style.opacity = 0;
+          el.style.transform = 'translateY(14px)';
+          el.style.transition = 'opacity .35s cubic-bezier(.22,1,.36,1), transform .35s cubic-bezier(.22,1,.36,1)';
+          setTimeout(function () { el.style.opacity = 1; el.style.transform = 'none'; }, 20 + Math.min(i, 14) * 25);
+        });
+      }
+    }
+
+    renderMonthView();
   }
 
   renderCalendar('all', 'all');
@@ -1228,6 +1448,46 @@
       renderCalendar(currentCalCat, f.getAttribute('data-filter'));
     });
   });
+
+  var calViewBtns = document.querySelectorAll('.cal-view-btn[data-view]');
+  calViewBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var view = btn.getAttribute('data-view');
+      if (view === currentCalView) return;
+      currentCalView = view;
+      calViewBtns.forEach(function (b) {
+        var isAct = b.getAttribute('data-view') === view;
+        b.classList.toggle('active', isAct);
+        b.setAttribute('aria-pressed', isAct ? 'true' : 'false');
+      });
+
+      if (currentCalView === 'list') {
+        if (calGrid) calGrid.classList.remove('hidden');
+        if (calMonthWrap) calMonthWrap.classList.add('hidden');
+      } else {
+        if (calGrid) calGrid.classList.add('hidden');
+        if (calMonthWrap) calMonthWrap.classList.remove('hidden');
+        renderMonthView();
+      }
+    });
+  });
+
+  if (monthPrevBtn) {
+    monthPrevBtn.addEventListener('click', function () {
+      if (currentMonthIdx > 0) {
+        currentMonthIdx--;
+        renderMonthView();
+      }
+    });
+  }
+  if (monthNextBtn) {
+    monthNextBtn.addEventListener('click', function () {
+      if (currentMonthIdx < SEASON_MONTHS.length - 1) {
+        currentMonthIdx++;
+        renderMonthView();
+      }
+    });
+  }
 
   /* ── COUNT-UP for hero meta ── */
   function countUp(el) {
