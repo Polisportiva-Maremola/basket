@@ -72,17 +72,42 @@ jobs:
         run: |
           # Lista utenti modificabile senza toccare il YAML:
           # Repo → Settings → Variables → Actions → OPENCODE_ALLOWED_USERS
-          ALLOWED_USERS="${{ vars.OPENCODE_ALLOWED_USERS || 'nik2208 vibe-maribit mrmorgan77' }}"
-          if [ "$IS_MANUAL" = "true" ]; then exit 0; fi
-          ASSOC="${{ github.event.issue.author_association || github.event.comment.author_association }}"
-          if [ "$ASSOC" = "OWNER" ] || [ "$ASSOC" = "COLLABORATOR" ] || [ "$ASSOC" = "MEMBER" ]; then
-            echo "Utente '$COMMENT_AUTHOR' autorizzato con associazione $ASSOC."
+          ALLOWED_USERS="${{ vars.OPENCODE_ALLOWED_USERS || 'nb-camelot nik2208 vibe-maribit mrmorgan77' }}"
+          if [ "$IS_MANUAL" = "true" ]; then
+            echo "Esecuzione manuale (workflow_dispatch) autorizzata per '$COMMENT_AUTHOR'."
             exit 0
           fi
-          if ! echo " $ALLOWED_USERS " | grep -q " $COMMENT_AUTHOR "; then
-            echo "Utente '$COMMENT_AUTHOR' non autorizzato. Interrompo."
+
+          AUTHOR_LOWER=$(echo "$COMMENT_AUTHOR" | tr '[:upper:]' '[:lower:]')
+          ALLOWED_LOWER=$(echo "$ALLOWED_USERS" | tr '[:upper:]' '[:lower:]')
+
+          IS_AUTHORIZED=false
+          for u in $ALLOWED_LOWER; do
+            if [ "$u" = "$AUTHOR_LOWER" ]; then
+              IS_AUTHORIZED=true
+              break
+            fi
+          done
+
+          if [ "$IS_AUTHORIZED" != "true" ]; then
+            # Controllo fallback: verifica l'associazione effettiva dell'autore del comando
+            if [ -n "$COMMENT_ID" ]; then
+              ACTUAL_ASSOC="${{ github.event.comment.author_association }}"
+            else
+              ACTUAL_ASSOC="${{ github.event.issue.author_association }}"
+            fi
+            if [ "$ACTUAL_ASSOC" = "OWNER" ] || [ "$ACTUAL_ASSOC" = "COLLABORATOR" ]; then
+              echo "Utente '$COMMENT_AUTHOR' autorizzato con associazione $ACTUAL_ASSOC."
+              IS_AUTHORIZED=true
+            fi
+          fi
+
+          if [ "$IS_AUTHORIZED" != "true" ]; then
+            echo "⛔ Utente '$COMMENT_AUTHOR' non autorizzato ad invocare OpenCode. Interrompo."
+            echo "Per abilitarlo, inserisci l'username in Repo → Settings → Variables → Actions → OPENCODE_ALLOWED_USERS"
             exit 1
           fi
+          echo "✅ Utente '$COMMENT_AUTHOR' autorizzato per l'esecuzione agentica."
 
       # ── 2. Feedback immediato 👀 ─────────────────────────────────────────────
       - name: Reagisci al comando (👀)
@@ -188,6 +213,24 @@ jobs:
           if [ "$IS_PR" = "true" ]; then
             git fetch origin "$BRANCH_NAME"
             git checkout -B "$BRANCH_NAME" "origin/$BRANCH_NAME"
+          elif [ -n "$ISSUE_NUMBER" ]; then
+            # Controlla se esiste già una PR aperta per questo branch
+            OPEN_PR=$(curl -s \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "$API/pulls?state=open&per_page=50" \
+              | jq -r --arg b "$BRANCH_NAME" '.[] | select(.head.ref==$b) | .number' | head -n1)
+
+            if [ -n "$OPEN_PR" ]; then
+              echo "Trovata PR aperta #$OPEN_PR per il branch $BRANCH_NAME: continuo su di essa."
+              echo "pr_number=$OPEN_PR" >> "$GITHUB_OUTPUT"
+              git fetch origin "$BRANCH_NAME"
+              git checkout -B "$BRANCH_NAME" "origin/$BRANCH_NAME"
+            else
+              # Se la PR precedente era già stata chiusa/mergiata su main, partiamo dal main aggiornato
+              git fetch origin main
+              git checkout -B "$BRANCH_NAME" origin/main
+            fi
           elif git ls-remote --exit-code --heads origin "$BRANCH_NAME" > /dev/null 2>&1; then
             git fetch origin "$BRANCH_NAME"
             git checkout -B "$BRANCH_NAME" "origin/$BRANCH_NAME"
@@ -195,22 +238,31 @@ jobs:
             git checkout -b "$BRANCH_NAME"
           fi
 
-      - name: Raccogli contesto aggiuntivo (diff + commenti se PR)
+      - name: Raccogli contesto aggiuntivo (diff + commenti)
         run: |
           API="$GH_API/repos/$REPO"
           : > /tmp/context.txt
           if [ "${{ steps.ctx.outputs.is_pr }}" = "true" ]; then
             PR_NUMBER="${{ steps.ctx.outputs.pr_number }}"
-            echo "== Diff della PR ==" >> /tmp/context.txt
+            echo "== Diff della PR #$PR_NUMBER ==" >> /tmp/context.txt
             curl -s \
               -H "Authorization: Bearer $GH_TOKEN" \
               -H "Accept: application/vnd.github.diff" \
               "$API/pulls/$PR_NUMBER" >> /tmp/context.txt
-            echo "== Commenti recenti ==" >> /tmp/context.txt
+            echo "== Commenti recenti della PR ==" >> /tmp/context.txt
             curl -s \
               -H "Authorization: Bearer $GH_TOKEN" \
               -H "Accept: application/vnd.github+json" \
               "$API/issues/$PR_NUMBER/comments" \
+              | jq -r '.[] | "- (\(.user.login)): \(.body)"' >> /tmp/context.txt || true
+          fi
+
+          if [ -n "$ISSUE_NUMBER" ]; then
+            echo "== Cronologia commenti Issue #$ISSUE_NUMBER ==" >> /tmp/context.txt
+            curl -s \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "$API/issues/$ISSUE_NUMBER/comments" \
               | jq -r '.[] | "- (\(.user.login)): \(.body)"' >> /tmp/context.txt || true
           fi
 
@@ -277,14 +329,62 @@ jobs:
           CHOSEN_MODEL="${{ steps.model.outputs.selected_model }}"
           mkdir -p issue_plans
           PLAN_FILE="issue_plans/${{ steps.ctx.outputs.plan_key }}.md"
+          CLEAN_PROMPT=$(cat /tmp/clean_prompt.txt)
+          PROMPT_NONEMPTY=$(echo "$CLEAN_PROMPT" | tr -d '[:space:]')
+          CONTEXT=$(cat /tmp/context.txt 2>/dev/null || true)
 
-          if [ -s "$PLAN_FILE" ]; then
-            echo "📋 Piano esistente trovato in $PLAN_FILE: riutilizzo il piano."
+          if [ -s "$PLAN_FILE" ] && [ -n "$PROMPT_NONEMPTY" ]; then
+            echo "🔄 Piano esistente trovato in $PLAN_FILE, ma è presente una nuova richiesta/feedback dell'utente: aggiorno il piano..."
+            OLD_PLAN=$(cat "$PLAN_FILE")
+
+            PLAN_PROMPT="Sei in modalità PLAN (REVISIONE/AGGIORNAMENTO PIANO): NON modificare alcun file di codice.
+            Esiste già un piano di lavoro precedente che era stato eseguito per questa issue:
+
+            === PIANO PRECEDENTE ===
+            $OLD_PLAN
+
+            === NUOVA RICHIESTA / FEEDBACK DI CORREZIONE ($COMMENT_AUTHOR) ===
+            $CLEAN_PROMPT
+
+            === CONTESTO E CRONOLOGIA ISSUE ===
+            Titolo: $ISSUE_TITLE
+            Descrizione: $ISSUE_BODY
+            $CONTEXT
+
+            L'utente ha aggiunto nuove specifiche o ha richiesto correzioni rispetto a quanto già fatto.
+            Analizza il codebase attuale e aggiorna il piano producendo un Markdown con questa struttura ESATTA:
+
+            # Piano
+            ## Obiettivo
+            ## Task
+            (elenco numerato di task atomici per soddisfare le nuove correzioni e requisiti)
+            ## Acceptance Criteria
+            (checklist '- [ ] ...' di criteri oggettivi e verificabili per le modifiche richieste)
+            ## Verifica
+            (comandi da lanciare o verifiche da eseguire)
+
+            Restituisci SOLO il documento Markdown del piano aggiornato."
+
+            if ! opencode run --agent plan --model "$CHOSEN_MODEL" "$PLAN_PROMPT" > "$PLAN_FILE"; then
+              if [ "$CHOSEN_MODEL" != "opencode/big-pickle" ]; then
+                echo "⚠️ Errore con $CHOSEN_MODEL. Fallback a opencode/big-pickle per l'aggiornamento piano..."
+                CHOSEN_MODEL="opencode/big-pickle"
+                opencode run --agent plan --model "$CHOSEN_MODEL" "$PLAN_PROMPT" > "$PLAN_FILE" || true
+              fi
+            fi
+            cat "$PLAN_FILE"
+
+            cp "$PLAN_FILE" /tmp/plan.md
+            git add "$PLAN_FILE"
+            git commit -m "OpenCode: aggiornamento piano di lavoro (${{ steps.ctx.outputs.plan_key }})" \
+              || echo "Nessun piano da committare."
+            git push origin "$BRANCH_NAME" || true
+
+          elif [ -s "$PLAN_FILE" ]; then
+            echo "📋 Piano esistente trovato in $PLAN_FILE (nessun nuovo commento specificato): riutilizzo il piano."
             cp "$PLAN_FILE" /tmp/plan.md
           else
-            CLEAN_PROMPT=$(cat /tmp/clean_prompt.txt)
-            CONTEXT=$(cat /tmp/context.txt 2>/dev/null || true)
-
+            echo "🆕 Nessun piano esistente: generazione nuovo piano..."
             PLAN_PROMPT="Sei in modalità PLAN (SOLA LETTURA): NON modificare alcun file.
             Analizza il codebase e la richiesta, poi produci un piano di lavoro in Markdown
             con questa struttura ESATTA:
@@ -317,7 +417,6 @@ jobs:
             git add "$PLAN_FILE"
             git commit -m "OpenCode: piano di lavoro (${{ steps.ctx.outputs.plan_key }})" \
               || echo "Nessun piano da committare."
-            # Push immediato del piano sul feature branch remoto per checkpoint
             git push origin "$BRANCH_NAME" || true
           fi
 
@@ -338,10 +437,13 @@ jobs:
             BUILD_PROMPT="Sei in modalità BUILD. Implementa il piano completando TUTTI i task e
             soddisfacendo TUTTI gli Acceptance Criteria. Applica le modifiche ai file.
 
-            === PIANO ===
+            === NUOVA RICHIESTA / ULTIMO FEEDBACK UTENTE ($COMMENT_AUTHOR) ===
+            ${CLEAN_PROMPT:-Nessun feedback specifico aggiunto.}
+
+            === PIANO DI LAVORO ===
             ${PLAN:-Nessun piano formale. Richiesta: $CLEAN_PROMPT}
 
-            === CONTESTO ===
+            === CONTESTO GENERALE E CRONOLOGIA ===
             $CONTEXT
 
             === FEEDBACK REVIEW PRECEDENTE ===
@@ -365,7 +467,10 @@ jobs:
             REVIEW_PROMPT="Verifica sul codice ATTUALE se OGNI Acceptance Criterion del piano è
             soddisfatto. Puoi eseguire build/lint/test ma NON modificare i file.
 
-            === PIANO ===
+            === ULTIMO FEEDBACK UTENTE ($COMMENT_AUTHOR) ===
+            ${CLEAN_PROMPT:-Nessun feedback specifico.}
+
+            === PIANO ED ACCEPTANCE CRITERIA ===
             ${PLAN:-Richiesta originale: $CLEAN_PROMPT}
 
             Scrivi come ULTIMA riga ESATTAMENTE una di queste:
@@ -538,6 +643,10 @@ jobs:
                 -H "Content-Type: application/json" \
                 -d '{"state":"closed","state_reason":"completed"}' > /dev/null || true
             fi
+
+            # Rimozione pulita del feature branch remoto per evitare conflitti su future riaperture
+            echo "🧹 Rimozione del feature branch remoto ${{ steps.ctx.outputs.branch_name }}..."
+            git push origin --delete "${{ steps.ctx.outputs.branch_name }}" 2>/dev/null || true
 
             echo "🚀 Richiesta nuova build di GitHub Pages..."
             curl -s -X POST \
