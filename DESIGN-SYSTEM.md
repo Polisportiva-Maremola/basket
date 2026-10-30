@@ -226,10 +226,11 @@ main#top
   section.hero                         campo SVG + titolo + scorebug + ticker
   section.section#storia               01
   section.section#roster               02
-  section.section#sponsor              03
-  section.section#documenti            04
-  section.section#tesseramenti         05
-  section.section#info                 06
+  section.section#calendari            03
+  section.section#sponsor              04
+  section.section#documenti            05
+  section.section#tesseramenti         06
+  section.section#info                 07
 aside.live-offcanvas#liveOffcanvas     pannello della diretta (fuori da main)
 footer.foot
 script app.js
@@ -254,6 +255,7 @@ script app.js
 |---|---|---|---|
 | `.tl-grid` | `repeat(auto-fit, minmax(210px, 1fr))` | 0 | :352 |
 | `.roster` | `repeat(auto-fill, minmax(220px, 1fr))` | 18px | :378 |
+| `.cal-grid` | `repeat(auto-fill, minmax(320px, 1fr))` (1 col sotto 560px) | 16px | :466, :856 |
 | `.sponsor-grid.gold` | `repeat(auto-fill, minmax(220px, 1fr))` | 14px | :423 |
 | `.sponsor-grid.tech` | `repeat(auto-fill, minmax(160px, 1fr))` | 14px | :424 |
 | `.docs` | `repeat(auto-fill, minmax(300px, 1fr))` | 14px | :442 |
@@ -550,22 +552,49 @@ Card generata da `renderRoster` (`app.js:97-125`):
 **Fai**: per aggiungere un giocatore aggiungi un oggetto all'array giusto in `rosters`, sempre con tre statistiche in `st`. Per una nuova squadra aggiungi una chiave in `rosters` e un `button.tab` con `data-roster` uguale.
 **Non fare**: non scrivere card a mano in `#rosterGrid`: `renderRoster` sostituisce il contenuto con `innerHTML`.
 
-### 4.13 Sponsor
+### 4.13 Calendari
+
+```html
+<div class="cal-controls reveal">
+  <div class="tabs" role="tablist" aria-label="Seleziona categoria calendario">
+    <button class="tab" role="tab" aria-selected="true" data-cal="all">Tutte le squadre</button>
+    <button class="tab" role="tab" aria-selected="false" data-cal="dr2">DR2 · Maschile</button>
+    <button class="tab" role="tab" aria-selected="false" data-cal="u17">Under 17</button>
+    <button class="tab" role="tab" aria-selected="false" data-cal="u14f">Under 14 Femm.</button>
+  </div>
+  <div class="cal-subbar">
+    <div class="cal-filters" role="group" aria-label="Filtra partite">
+      <button class="cal-filter active" data-filter="all">Tutte</button>
+      <button class="cal-filter" data-filter="andata">Andata</button>
+      <button class="cal-filter" data-filter="ritorno">Ritorno</button>
+      <button class="cal-filter" data-filter="home">Solo Casa</button>
+    </div>
+    <div class="cal-actions">
+      <a class="btn btn-ghost cal-dl-btn" id="calDownloadBtn" href="assets/calendari/calendario-dr2-2026-2027.pdf" target="_blank" rel="noopener">Scarica PDF ↓</a>
+    </div>
+  </div>
+</div>
+<div class="cal-grid reveal" id="calGrid" aria-live="polite"></div>
+```
+
+- Dati: file `matches.json` (42 gare ufficiali) con fallback integrato in `app.js`.
+- Card generata da `renderCalendar(cat, filter)`: `.mcard` con sigle squadre, codice gara, orario, luogo, badge `CASA`/`TRASF`. Variante `.mcard.next` per la prossima partita cronologica e `.mcard.bye` per il turno di riposo.
+- Scorebug in Hero: `updateNextMatch()` legge le partite e imposta countdown e tabellone sulla prima sfida futura rispetto a `Date.now()`.
+
+### 4.14 Sponsor
 
 ```html
 <div class="sponsor-tier">
-  <div class="tier-label"><b>Gold Partner</b><span class="ln"></span></div>
-  <div class="sponsor-grid gold">
-    <div class="slogo"><span class="ph">LOGO</span> Partner A</div>
+  <div class="tier-label"><b>Main Sponsor</b><span class="ln"></span></div>
+  <div class="sponsor-grid main">
+    <div class="slogo">
+      <img src="assets/eon.svg" alt="Logo E-on" loading="lazy" decoding="async">
+    </div>
   </div>
 </div>
 ```
 
-- CSS `styles.css:417-437`. Varianti di griglia: `.main` (1 colonna, card alta 150px, testo 2rem, bordo blu, `.ph` 54px su fondo blu), `.gold` (minmax 220px), `.tech` (minmax 160px, card 72px, testo 1rem).
-- `.slogo`: alta 96px, display 800; hover con testo bianco e bordo ciano. `.ph` è il riquadro segnaposto del logo (34×34).
-- Oggi i loghi sono segnaposto di testo (`index.html:201-219`): `.ph` con `LOGO` per main e gold, `SP` per tech. Nessun JS.
-
-**Non fare**: il codice non prevede ancora un'immagine dentro `.slogo`; chi la aggiunge deve definirne lo stile.
+- CSS `styles.css`. Griglia `.main`: max 420px, card `.slogo` alta max 140px con `object-fit: contain` su `img` (max 220×64px) per mantenere la coerenza con la palette Dark Arena anche su display 4K/ultrawide. Logo vettoriale locale `assets/eon.svg`.
 
 ### 4.14 Documenti
 
@@ -831,7 +860,7 @@ Soglie AA: 4,5:1 testo normale; 3:1 testo grande (≥24px, o ≥18,66px in grass
 
 - **`CNAME`** (contiene `basket.polmaremola.it`): lega il sito al dominio pubblicato.
 - **`.github/workflows/opencode.yml`**: è il flusso dell'agente opencode sulle issue e richiede la build di GitHub Pages a fine lavoro (`opencode.yml:487-547`). Non modificarlo come parte di un ritocco al sito.
-- Gli id usati da JS: `clock`, `ticker`, `rosterGrid`, `burger`, `hud`, `liveToggle`, `liveOffcanvas`, `liveClose`, `liveBackdrop`, `liveFrame`, e gli attributi `data-count`, `data-cd`, `data-roster`, `data-src`. Rinominarli rompe `app.js`.
+- Gli id usati da JS: `clock`, `ticker`, `rosterGrid`, `rosterTeamPhoto`, `calGrid`, `calDownloadBtn`, `heroScorebug`, `scorebugCategory`, `scorebugCode`, `scorebugHome`, `scorebugAway`, `scorebugWhen`, `scorebugLocation`, `burger`, `hud`, `liveToggle`, `liveOffcanvas`, `liveClose`, `liveBackdrop`, `liveFrame`, e gli attributi `data-count`, `data-cd`, `data-roster`, `data-cal`, `data-filter`, `data-src`. Rinominarli rompe `app.js`.
 - Le classi che `app.js` seleziona: `.reveal` (`app.js:166`), `.hero-meta` e `.m` (`app.js:160, 167`), `.tab[data-roster]` (`app.js:128`), `.nav a` (`app.js:171, 192`), oltre all'attributo `href` dei link della nav (`app.js:173`). Rinominarle rompe reveal, count-up, tab, scroll-spy e menu mobile.
 - Gli `id` delle sezioni: sono le ancore della nav, del footer e dello scroll-spy.
 

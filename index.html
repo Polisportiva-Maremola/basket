@@ -37,6 +37,7 @@
     <nav class="nav" id="nav">
       <a href="#storia">Storia</a>
       <a href="#roster">Squadre</a>
+      <a href="#calendari">Calendari</a>
       <a href="#sponsor">Sponsor</a>
       <a href="#documenti">Documenti</a>
       <a href="#tesseramenti">Tesseramenti</a>
@@ -71,7 +72,7 @@
   <div class="wrap hero-grid">
     <div>
       <div class="hero-eyebrow">
-        <span class="kicker">Stagione 2025 / 26 · Serie D</span>
+        <span class="kicker">Stagione 2026 / 27 · DR2</span>
         <span class="pill"><span class="dot-live"></span> Reparto Agonistico</span>
       </div>
       <h1>
@@ -82,7 +83,7 @@
       <p class="lede">Dal parquet del quartiere alla diretta del palazzetto. Una polisportiva, cinque squadre, un solo colore: <strong style="color:var(--white)">il blu</strong>.</p>
       <div class="hero-cta">
         <a href="#tesseramenti" class="btn btn-primary">Tesserati ora</a>
-        <a href="#roster" class="btn btn-ghost">Il roster ▸</a>
+        <a href="#calendari" class="btn btn-ghost">Calendari ▸</a>
       </div>
       <div class="hero-meta">
         <div class="m" data-count="1987"><b>1987</b><span>Anno di fondazione</span></div>
@@ -92,25 +93,25 @@
     </div>
 
     <!-- SCOREBUG -->
-    <aside class="scorebug" aria-label="Prossima partita">
+    <aside class="scorebug" id="heroScorebug" aria-label="Prossima partita">
       <div class="scorebug-top">
-        <span>Prossima · Serie D · Girone A</span>
-        <span class="live"><span class="dot-live"></span> J-7</span>
+        <span id="scorebugCategory">Prossima · Under 17</span>
+        <span class="live" id="scorebugCode"><span class="dot-live"></span> Gara #808</span>
       </div>
       <div class="matchup">
-        <div class="team home">
+        <div class="team home" id="scorebugHome">
           <div class="crest">MAR</div>
           <b>Maremola</b>
-          <span>Casa · 12-3</span>
+          <span>Casa · PalaMaremola</span>
         </div>
         <div class="vs">VS</div>
-        <div class="team away">
-          <div class="crest">SVN</div>
-          <b>Savona</b>
-          <span>Trasf. · 10-5</span>
+        <div class="team away" id="scorebugAway">
+          <div class="crest">BOR</div>
+          <b>Bordighera</b>
+          <span>Trasferta</span>
         </div>
       </div>
-      <div class="scorebug-when">SAB 06 GIU · 21:00 · PalaMaremola</div>
+      <div class="scorebug-when" id="scorebugWhen">SAB 31 OTT · 17:00 · PalaMaremola</div>
       <div class="countdown" id="countdown">
         <div class="cd"><b data-cd="d">--</b><span>Giorni</span></div>
         <div class="cd"><b data-cd="h">--</b><span>Ore</span></div>
@@ -118,8 +119,8 @@
         <div class="cd"><b data-cd="s">--</b><span>Sec</span></div>
       </div>
       <div class="scorebug-foot">
-        <span>Biglietti · Settore Tifoseria</span>
-        <a href="#info">Come arrivare ▸</a>
+        <span id="scorebugLocation">Palazzetto · Pietra Ligure</span>
+        <a href="#calendari">Tutti i calendari ▸</a>
       </div>
     </aside>
   </div>
@@ -181,11 +182,55 @@
 
     <div class="tabs reveal" role="tablist">
       <button class="tab" role="tab" aria-selected="true" data-roster="prima">Prima Squadra</button>
-      <button class="tab" role="tab" aria-selected="false" data-roster="under">Under 19</button>
+      <button class="tab" role="tab" aria-selected="false" data-roster="under">Under 17</button>
       <button class="tab" role="tab" aria-selected="false" data-roster="mini">Minibasket</button>
     </div>
 
+    <div class="roster-team-photo hidden" id="rosterTeamPhoto">
+      <img src="assets/squadra-u17.jpg" alt="Squadra Under 17 Polisportiva Maremola Basket" loading="lazy">
+      <div class="roster-photo-cap">
+        <b>Squadra Under 17 · Stagione 2026/27</b>
+        <span>Polisportiva Maremola Basket · Maglia Ufficiale Blu</span>
+      </div>
+    </div>
+
     <div class="roster reveal" id="rosterGrid"></div>
+  </div>
+</section>
+
+<!-- ═══════════ CALENDARI ═══════════ -->
+<section class="section" id="calendari">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">03 — Calendari 2026 / 27</span>
+      <h2 class="sec-title">Le sfide <em>ufficiali</em></h2>
+      <p>Il calendario completo delle gare per DR2, Under 17 e Under 14 Femminile. La card prossima partita in alto si sincronizza automaticamente con la prima sfida in arrivo.</p>
+    </div>
+
+    <div class="cal-controls reveal">
+      <div class="tabs" role="tablist" aria-label="Seleziona categoria calendario">
+        <button class="tab" role="tab" aria-selected="true" data-cal="all">Tutte le squadre</button>
+        <button class="tab" role="tab" aria-selected="false" data-cal="dr2">DR2 · Maschile</button>
+        <button class="tab" role="tab" aria-selected="false" data-cal="u17">Under 17</button>
+        <button class="tab" role="tab" aria-selected="false" data-cal="u14f">Under 14 Femm.</button>
+      </div>
+
+      <div class="cal-subbar">
+        <div class="cal-filters" role="group" aria-label="Filtra partite">
+          <button class="cal-filter active" data-filter="all">Tutte</button>
+          <button class="cal-filter" data-filter="andata">Andata</button>
+          <button class="cal-filter" data-filter="ritorno">Ritorno</button>
+          <button class="cal-filter" data-filter="home">Solo Casa</button>
+        </div>
+        <div class="cal-actions">
+          <a class="btn btn-ghost cal-dl-btn" id="calDownloadBtn" href="assets/calendari/calendario-dr2-2026-2027.pdf" target="_blank" rel="noopener">
+            Scarica PDF ↓
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="cal-grid reveal" id="calGrid" aria-live="polite"></div>
   </div>
 </section>
 
@@ -193,9 +238,9 @@
 <section class="section" id="sponsor">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="kicker">03 — Official partners</span>
+      <span class="kicker">04 — Official partners</span>
       <h2 class="sec-title">Chi scende in campo <em>con noi</em></h2>
-      <p>Loghi segnaposto. Inviaci i file vettoriali dei tuoi partner e li montiamo al posto giusto.</p>
+      <p>I partner e gli sponsor ufficiali che sostengono la prima squadra e il settore giovanile della Polisportiva Maremola.</p>
     </div>
 
     <div class="reveal">
@@ -203,7 +248,7 @@
         <div class="tier-label"><b>Main Sponsor</b><span class="ln"></span></div>
         <div class="sponsor-grid main">
           <div class="slogo">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3YDvQEK_QLD3VmGztPiRMD--da4-TaSXIfDJ9v5TcSa9sD8lbe2MJqdk&amp;s" alt="Logo E-on" loading="lazy" decoding="async">
+            <img src="assets/eon.svg" alt="Logo E-on" loading="lazy" decoding="async">
           </div>
         </div>
       </div>
@@ -215,12 +260,27 @@
 <section class="section" id="documenti">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="kicker">04 — Documenti &amp; modulistica</span>
+      <span class="kicker">05 — Documenti &amp; modulistica</span>
       <h2 class="sec-title">Tutto in <em>chiaro</em></h2>
-      <p>Statuto, regolamenti e moduli per il tesseramento. Sostituisci i collegamenti con i tuoi PDF.</p>
+      <p>Statuto, calendari ufficiali e moduli per il tesseramento da scaricare in formato PDF.</p>
     </div>
 
     <div class="docs reveal">
+      <a class="doc" href="assets/calendari/calendario-dr2-2026-2027.pdf" target="_blank" rel="noopener">
+        <div class="doc-ic"><b>PDF</b></div>
+        <div class="doc-info"><b>Calendario DR2 2026/27</b><span>PDF · Definitivo FIP</span></div>
+        <div class="doc-dl">↓</div>
+      </a>
+      <a class="doc" href="assets/calendari/calendario-u17-2026-2027.pdf" target="_blank" rel="noopener">
+        <div class="doc-ic"><b>PDF</b></div>
+        <div class="doc-info"><b>Calendario Under 17 2026/27</b><span>PDF · Definitivo FIP</span></div>
+        <div class="doc-dl">↓</div>
+      </a>
+      <a class="doc" href="assets/calendari/calendario-u14f-2026-2027.pdf" target="_blank" rel="noopener">
+        <div class="doc-ic"><b>PDF</b></div>
+        <div class="doc-info"><b>Calendario Under 14 Femm. 2026/27</b><span>PDF · Definitivo FIP</span></div>
+        <div class="doc-dl">↓</div>
+      </a>
       <a class="doc" href="#">
         <div class="doc-ic"><b>PDF</b></div>
         <div class="doc-info"><b>Statuto societario</b><span>PDF · 240 KB · agg. 2024</span></div>
@@ -233,22 +293,7 @@
       </a>
       <a class="doc" href="#">
         <div class="doc-ic"><b>PDF</b></div>
-        <div class="doc-info"><b>Modulo di iscrizione</b><span>PDF · 95 KB · stagione 25/26</span></div>
-        <div class="doc-dl">↓</div>
-      </a>
-      <a class="doc" href="#">
-        <div class="doc-ic"><b>PDF</b></div>
-        <div class="doc-info"><b>Certificato medico — fac-simile</b><span>PDF · 60 KB</span></div>
-        <div class="doc-dl">↓</div>
-      </a>
-      <a class="doc" href="#">
-        <div class="doc-ic"><b>DOC</b></div>
-        <div class="doc-info"><b>Delega ritiro minori</b><span>DOCX · 40 KB</span></div>
-        <div class="doc-dl">↓</div>
-      </a>
-      <a class="doc" href="#">
-        <div class="doc-ic"><b>PDF</b></div>
-        <div class="doc-info"><b>Informativa privacy</b><span>PDF · 120 KB · GDPR</span></div>
+        <div class="doc-info"><b>Modulo di iscrizione</b><span>PDF · 95 KB · stagione 26/27</span></div>
         <div class="doc-dl">↓</div>
       </a>
     </div>
@@ -259,7 +304,7 @@
 <section class="section" id="tesseramenti">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="kicker">05 — Tesseramenti</span>
+      <span class="kicker">06 — Tesseramenti</span>
       <h2 class="sec-title">Scegli la tua <em>categoria</em></h2>
       <p>Quote indicative della stagione. Sconto fratelli e agevolazioni su richiesta in segreteria.</p>
     </div>
@@ -317,7 +362,7 @@
 <section class="section" id="info">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="kicker">06 — Info &amp; contatti</span>
+      <span class="kicker">07 — Info &amp; contatti</span>
       <h2 class="sec-title">Vieni al <em>palazzetto</em></h2>
     </div>
 
@@ -387,7 +432,7 @@
         <p style="color:var(--ink-dim); max-width:34ch; margin-top:18px; font-size:0.9rem;">Una polisportiva del ponente ligure. Cresciamo atleti, non solo giocatori.</p>
       </div>
       <div class="foot-cols">
-        <div class="foot-col"><b>Società</b><a href="#storia">Storia</a><a href="#roster">Squadre</a><a href="#sponsor">Sponsor</a></div>
+        <div class="foot-col"><b>Società</b><a href="#storia">Storia</a><a href="#roster">Squadre</a><a href="#calendari">Calendari</a><a href="#sponsor">Sponsor</a></div>
         <div class="foot-col"><b>Atleti</b><a href="#tesseramenti">Tesseramenti</a><a href="#documenti">Documenti</a><a href="#info">Orari</a></div>
         <div class="foot-col"><b>Contatti</b><a href="#info">PalaMaremola</a><a href="#">Instagram</a><a href="mailto:polisportivamaremola1914@gmail.com">Email</a></div>
       </div>
