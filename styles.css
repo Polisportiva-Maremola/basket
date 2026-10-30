@@ -474,8 +474,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 14px; font-family: var(--font-hud); font-weight: 600;
   font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--ink-soft); transition: all 0.15s ease;
+  color: var(--ink-soft); transition: all 0.15s ease; cursor: pointer;
 }
+.cal-view-btn * { pointer-events: none; }
 .cal-view-btn svg { width: 13px; height: 13px; opacity: 0.75; }
 .cal-view-btn:hover { color: var(--white); }
 .cal-view-btn.active {
@@ -490,6 +491,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 16px; margin-top: 24px;
 }
+.cal-grid.hidden { display: none !important; }
 .mcard {
   position: relative; border-radius: 10px; overflow: hidden;
   background: linear-gradient(168deg, var(--navy-850), var(--navy-900));
@@ -745,6 +747,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 14px;
 }
+.month-no-matches { grid-column: 1 / -1; width: 100%; }
 
 /* ════════════════════════════════════════════
    SPONSOR

@@ -1187,8 +1187,9 @@
       var formattedDate = dParts.length === 3 ? dParts[2] + '/' + dParts[1] + '/' + dParts[0] : '';
       monthDetailDate.textContent = formattedDate ? 'Giorno ' + formattedDate : 'Nessuna partita';
       if (monthDetailCount) monthDetailCount.textContent = '0 gare in programma';
-      monthDetailMatches.innerHTML = '<div class="mcard bye" style="grid-column: 1 / -1;"><div class="mcard-bye-title">Nessun match ufficiale</div><div class="mcard-bye-sub">Nessuna gara a calendario per la data o i filtri selezionati</div></div>';
+      monthDetailMatches.innerHTML = '<div class="mcard bye month-no-matches"><div class="mcard-bye-title">Nessun match ufficiale</div><div class="mcard-bye-sub">Nessuna gara a calendario per la data o i filtri selezionati</div></div>';
       monthDayDetail.classList.remove('hidden');
+      monthDayDetail.style.display = 'flex';
       return;
     }
 
@@ -1451,7 +1452,8 @@
 
   var calViewBtns = document.querySelectorAll('.cal-view-btn[data-view]');
   calViewBtns.forEach(function (btn) {
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', function (e) {
+      if (e && e.preventDefault) e.preventDefault();
       var view = btn.getAttribute('data-view');
       if (view === currentCalView) return;
       currentCalView = view;
@@ -1462,11 +1464,23 @@
       });
 
       if (currentCalView === 'list') {
-        if (calGrid) calGrid.classList.remove('hidden');
-        if (calMonthWrap) calMonthWrap.classList.add('hidden');
+        if (calGrid) {
+          calGrid.classList.remove('hidden');
+          calGrid.style.display = '';
+        }
+        if (calMonthWrap) {
+          calMonthWrap.classList.add('hidden');
+          calMonthWrap.style.display = 'none';
+        }
       } else {
-        if (calGrid) calGrid.classList.add('hidden');
-        if (calMonthWrap) calMonthWrap.classList.remove('hidden');
+        if (calGrid) {
+          calGrid.classList.add('hidden');
+          calGrid.style.display = 'none';
+        }
+        if (calMonthWrap) {
+          calMonthWrap.classList.remove('hidden');
+          calMonthWrap.style.display = 'flex';
+        }
         renderMonthView();
       }
     });
