@@ -183,7 +183,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   display: flex; align-items: center; gap: 28px;
 }
 .brand { display: flex; align-items: center; gap: 12px; }
-.brand img { width: 38px; height: auto; filter: drop-shadow(0 3px 8px oklch(0.2 0.1 260 / 0.6)); }
+.brand img { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 3px 8px oklch(0.2 0.1 260 / 0.6)); }
 .brand-name { display: flex; flex-direction: column; line-height: 1; }
 .brand-name b {
   font-family: var(--font-display); font-weight: 800; font-size: 1.18rem;
@@ -702,7 +702,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
    ════════════════════════════════════════════ */
 .foot { position: relative; z-index: 1; border-top: 1px solid var(--line); padding: 56px 0 30px; margin-top: 40px; }
 .foot-top { display: flex; justify-content: space-between; gap: 30px; flex-wrap: wrap; align-items: flex-start; }
-.foot .brand img { width: 52px; }
+.foot .brand img { width: 52px; height: 52px; object-fit: contain; }
 .foot-cols { display: flex; gap: 64px; flex-wrap: wrap; }
 .foot-col b { font-family: var(--font-hud); font-weight: 700; font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cyan); display: block; margin-bottom: 14px; }
 .foot-col a { display: block; color: var(--ink-soft); font-size: 0.9rem; padding: 5px 0; transition: color 0.15s; }

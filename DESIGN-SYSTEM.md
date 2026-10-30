@@ -7,8 +7,8 @@ File del sito:
 - `index.html`: la pagina, una sola.
 - `styles.css`: tutto lo stile del sito (693 righe), con i token in `:root`.
 - `app.js`: orologio, countdown, ticker, roster, count-up dei contatori (`app.js:137-152`), reveal, scroll-spy della nav (`app.js:170-185`), menu mobile, pannello della diretta.
-- `assets/crest.svg`: lo stemma, un segnaposto ("stemma (placeholder)", `crest.svg:1`).
-- `assets/favicon.svg`, `favicon.ico` (16/32/48 px), `assets/favicon-32.png`, `assets/apple-touch-icon.png` (180 px) e `assets/icon-512.png`: la favicon, ricavata dallo stemma senza la scritta «PM» (illeggibile in piccolo); le icone quadrate hanno il fondo `#070d24`. Se cambia lo stemma, vanno rigenerate.
+- `assets/logo.png` (e `assets/crest.svg`): il logo/stemma circolare ufficiale Maremola Basket ad alta risoluzione.
+- `assets/favicon.svg`, `favicon.ico` (48 px), `assets/favicon-32.png`, `assets/apple-touch-icon.png` (180 px) e `assets/icon-512.png`: le favicon e le icone applicative, ricavate dal logo circolare ufficiale.
 - `scorebug.html`: l'overlay TV per lo streaming. È una pagina a sé, con stile proprio (vedi §4.20).
 
 Per chi legge:
@@ -927,7 +927,7 @@ Ogni voce: dove si trova, cosa succede, proposta. Le proposte sono suggerimenti,
 
 18. **Data della partita fissa contro countdown "vivo"**: "SAB 06 GIU · 21:00" (`index.html:109`) e "J-7" (`index.html:94`) sono statici, mentre il countdown punta sempre al prossimo sabato alle 21 (`app.js:19-29`). *Proposta*: una sola fonte (data in un attributo `data-` letta da JS, che genera sia il testo sia il countdown).
 19. **Pallino live sempre acceso** su pulsante LIVE, pill, scorebug e ticker (`index.html:43, 71, 94, 125`) anche senza diretta. *Proposta*: accenderlo solo durante una diretta.
-20. **Testi rivolti al gestore visibili al pubblico**: "Schede dimostrative, statistiche di esempio." (175), "Loghi segnaposto…" (194), "Sostituisci i collegamenti con i tuoi PDF." (232), stemma "placeholder" (`crest.svg:1`). *Proposta*: sostituirli con i contenuti reali prima di considerare il sito definitivo.
+20. **Testi rivolti al gestore visibili al pubblico**: "Schede dimostrative, statistiche di esempio." (175), "Loghi segnaposto…" (194), "Sostituisci i collegamenti con i tuoi PDF." (232). Lo stemma provvisorio è stato sostituito con il logo ufficiale circolare reale.
 22. **Lingue e sigle miste**: inglese senza `lang` (`index.html:43, 125, 175, 192-213`; `app.js:52, 106, 108`); sigle italiane e inglesi insieme (PT/AS/RB/ST/PTI/RIM con 3P/BS/PG/SF/C, `app.js:72-92`); `scorebug.html` con `lang="it"` e testi in inglese ("4th QTR", "BONUS", titolo "NBA Style Scoreboard Overlay"). *Proposta*: scegliere una lingua per le sigle e marcare le parti inglesi.
 23. **Formati della stagione diversi**: "2025 / 26" (`index.html:70`) e "25/26" (`index.html:248`, `app.js:58`). *Proposta*: un solo formato.
 
